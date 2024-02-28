@@ -1,95 +1,77 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+
+import axios from "axios";
+import { useRef, useState } from "react";
+
 
 export default function Home() {
+
+  const [txt, setTxt] = useState([])
+  const elInput = useRef()
+
+  async function dataCrl(type) {
+    let res
+    switch (type) {
+      case 'all': res = await axios.get('/api')
+        break;
+
+      case 'one': res = await axios.get('/api/1')
+        break;
+
+      case 'insert': res = await axios.post('/api', { id: Date.now(), title: elInput.current.value })
+        break;
+
+      case 'delete': res = await axios.delete('/api/1708479416350')
+        break;
+
+      case 'put': res = await axios.put('/api/id', { id: '2', title: '5프로젝트' })
+        break;
+    }
+    setTxt(res.data)
+
+  }
+
+  // useEffect(() => {
+  //   setTxt(res.data)
+  // }, [])
+  console.log(txt)
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <>
+      <article>
+        <h2>데이터 모두 가져오기(몽고)
+          <button onClick={() => { dataCrl('all') }}>전체출력</button>
+          <button onClick={() => { dataCrl('insert') }}>추가하기</button>
+          <button onClick={() => { dataCrl('one') }}>데이터 1개출력</button>
+          <button onClick={() => { dataCrl('delete') }}>삭제하기</button>
+          <button onClick={() => { dataCrl('put') }}>수정하기</button>
+        </h2>
+        <div></div>
+      </article>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+      <article>
+        <h2>데이터(몽고)</h2>
+        <form onSubmit={()=>{dataCrl('insert')}}>
+          <input type="text" ref={elInput}/>
+          <input type="submit" value='저장'></input>
+        </form>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+        <ul>
+          {
+            txt.map((obj) => (
+              <li key={obj.id}>
+              <p >{obj.title}</p>
+              </li>
+            ))
+          }
+        </ul>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
+      </article>
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+
+
+
+    </>
+
   );
 }
